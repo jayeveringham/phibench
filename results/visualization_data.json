@@ -1,0 +1,137 @@
+{
+  "summary": {
+    "total_networks": 20100,
+    "nonzero_phi_count": 4400,
+    "nonzero_phi_rate": 21.89,
+    "mean_phi": 0.387879,
+    "max_phi": 24.279594,
+    "mean_computation_time": 53.36,
+    "total_computation_hours": 297.94
+  },
+  "tpm_chart": {
+    "labels": [
+      "MAJORITY",
+      "AND",
+      "OR",
+      "XOR"
+    ],
+    "mean_phi": [
+      1.566938,
+      0.104567,
+      0.038729,
+      0.0
+    ],
+    "nonzero_rate": [
+      33.33,
+      27.88,
+      27.88,
+      0.0
+    ]
+  },
+  "topology_chart": {
+    "labels": [
+      "ring_lattice",
+      "watts_strogatz",
+      "random_geometric",
+      "erdos_renyi",
+      "modular",
+      "barabasi_albert"
+    ],
+    "nonzero_rate": [
+      73.53,
+      40.17,
+      21.05,
+      5.0,
+      0.0,
+      0.0
+    ],
+    "mean_phi": [
+      0.1875,
+      0.933232,
+      0.66699,
+      0.02932,
+      0.0,
+      0.0
+    ]
+  },
+  "node_size_chart": {
+    "labels": [
+      "n=4",
+      "n=5",
+      "n=6",
+      "n=7",
+      "n=8"
+    ],
+    "mean_time": [
+      0.04,
+      0.73,
+      5.55,
+      102.81,
+      192.28
+    ],
+    "max_time": [
+      0.41,
+      7.13,
+      124.0,
+      3466.87,
+      5313.84
+    ],
+    "by_tpm": {
+      "and": [
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375
+      ],
+      "or": [
+        0.1389,
+        0.1389,
+        0.1389,
+        0.1389,
+        0.1389
+      ],
+      "majority": [
+        0.401,
+        5.7992,
+        1.4665,
+        14.6678,
+        3.3768
+      ]
+    }
+  },
+  "heatmap": {
+    "and": {
+      "erdos_renyi": 5.0,
+      "watts_strogatz": 50.0,
+      "barabasi_albert": 0.0,
+      "modular": 0.0,
+      "ring_lattice": 100.0,
+      "random_geometric": 26.7
+    },
+    "or": {
+      "erdos_renyi": 5.0,
+      "watts_strogatz": 50.0,
+      "barabasi_albert": 0.0,
+      "modular": 0.0,
+      "ring_lattice": 100.0,
+      "random_geometric": 26.7
+    },
+    "majority": {
+      "erdos_renyi": 10.0,
+      "watts_strogatz": 63.0,
+      "barabasi_albert": 0.0,
+      "modular": 0.0,
+      "ring_lattice": 100.0,
+      "random_geometric": 33.3
+    },
+    "xor": {
+      "erdos_renyi": 0.0,
+      "watts_strogatz": 0.0,
+      "barabasi_albert": 0.0,
+      "modular": 0.0,
+      "ring_lattice": 0.0,
+      "random_geometric": 0.0
+    }
+  }
+}

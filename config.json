@@ -1,0 +1,43 @@
+{
+  "description": "PhiBench - Systematic IIT Phi benchmark across topologies and TPM rules",
+  "node_sizes": [4, 5, 6, 7, 8],
+  "networks_per_config": 50,
+  "tpm_rules": ["or", "and", "xor", "majority"],
+  "state": null,
+  "n_workers": null,
+  "topologies": {
+    "erdos_renyi": [
+      {"p": 0.2},
+      {"p": 0.3},
+      {"p": 0.5},
+      {"p": 0.7}
+    ],
+    "watts_strogatz": [
+      {"k": 2, "p": 0.0},
+      {"k": 2, "p": 0.1},
+      {"k": 2, "p": 0.3},
+      {"k": 4, "p": 0.0},
+      {"k": 4, "p": 0.1},
+      {"k": 4, "p": 0.3}
+    ],
+    "barabasi_albert": [
+      {"m": 1},
+      {"m": 2},
+      {"m": 3}
+    ],
+    "modular": [
+      {"n_modules": 2, "p_in": 0.6, "p_out": 0.1},
+      {"n_modules": 2, "p_in": 0.8, "p_out": 0.1},
+      {"n_modules": 2, "p_in": 0.8, "p_out": 0.3}
+    ],
+    "ring_lattice": [
+      {"k": 2},
+      {"k": 4}
+    ],
+    "random_geometric": [
+      {"radius": 0.3},
+      {"radius": 0.5},
+      {"radius": 0.7}
+    ]
+  }
+}

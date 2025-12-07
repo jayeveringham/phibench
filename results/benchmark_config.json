@@ -1,0 +1,97 @@
+{
+  "node_sizes": [
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "networks_per_config": 10,
+  "tpm_rule": "or",
+  "state": null,
+  "n_workers": null,
+  "topologies": {
+    "erdos_renyi": [
+      {
+        "p": 0.2
+      },
+      {
+        "p": 0.3
+      },
+      {
+        "p": 0.4
+      },
+      {
+        "p": 0.5
+      }
+    ],
+    "watts_strogatz": [
+      {
+        "k": 2,
+        "p": 0.1
+      },
+      {
+        "k": 2,
+        "p": 0.3
+      },
+      {
+        "k": 4,
+        "p": 0.1
+      },
+      {
+        "k": 4,
+        "p": 0.3
+      }
+    ],
+    "barabasi_albert": [
+      {
+        "m": 1
+      },
+      {
+        "m": 2
+      },
+      {
+        "m": 3
+      }
+    ],
+    "modular": [
+      {
+        "n_modules": 2,
+        "p_in": 0.6,
+        "p_out": 0.1
+      },
+      {
+        "n_modules": 3,
+        "p_in": 0.6,
+        "p_out": 0.1
+      },
+      {
+        "n_modules": 2,
+        "p_in": 0.8,
+        "p_out": 0.2
+      }
+    ],
+    "ring_lattice": [
+      {
+        "k": 2
+      },
+      {
+        "k": 4
+      }
+    ],
+    "fully_connected": [
+      {}
+    ],
+    "random_geometric": [
+      {
+        "radius": 0.3
+      },
+      {
+        "radius": 0.4
+      },
+      {
+        "radius": 0.5
+      }
+    ]
+  }
+}
