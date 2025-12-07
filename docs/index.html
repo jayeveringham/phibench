@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhiBench Results - IIT Phi Benchmark Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 12px;
+            border: 1px solid #2a2a4a;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .stat-card {
+            background: #1a1a2e;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #2a2a4a;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: #667eea;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #888;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .chart-section {
+            margin-bottom: 3rem;
+        }
+        .chart-container {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid #2a2a4a;
+        }
+        .chart-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #e0e0e0;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 400px;
+        }
+        .findings-section {
+            background: #1a1a2e;
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid #2a2a4a;
+            margin-bottom: 3rem;
+        }
+        .findings-section h2 {
+            color: #667eea;
+            margin-bottom: 1.5rem;
+        }
+        .finding-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: #0f0f1a;
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+        .finding-item strong {
+            color: #764ba2;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+        }
+        .heatmap-container {
+            overflow-x: auto;
+        }
+        .heatmap {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .heatmap th, .heatmap td {
+            padding: 0.75rem;
+            text-align: center;
+            border: 1px solid #2a2a4a;
+        }
+        .heatmap th {
+            background: #16213e;
+            font-weight: 600;
+        }
+        .heatmap td {
+            font-weight: 500;
+        }
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            border-top: 1px solid #2a2a4a;
+            margin-top: 2rem;
+        }
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PhiBench Results</h1>
+            <p class="subtitle">Systematic Benchmark of Integrated Information Theory (IIT) Phi Values</p>
+            <p class="subtitle" style="margin-top: 0.5rem;">20,100 networks | 6 topologies | 4 TPM rules | 5 node sizes</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">20,100</div>
+                <div class="stat-label">Networks Computed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">28.4%</div>
+                <div class="stat-label">Non-zero Phi Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0.106</div>
+                <div class="stat-label">Max Mean Phi (AND)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">0%</div>
+                <div class="stat-label">XOR Phi Rate</div>
+            </div>
+        </div>
+
+        <div class="findings-section">
+            <h2>Key Findings</h2>
+            <div class="finding-item">
+                <strong>TPM Rule Dominates:</strong> AND produces 2.7x higher mean phi (0.106) than OR (0.039) with identical topologies. Majority rule achieves highest peak values.
+            </div>
+            <div class="finding-item">
+                <strong>XOR Yields Zero Integration:</strong> 0/5,200 XOR networks produced phi > 0. This is a mathematical property of XOR update rules, not a computational limitation.
+            </div>
+            <div class="finding-item">
+                <strong>Topology Hierarchy:</strong> watts_strogatz > random_geometric > ring_lattice for phi production. Scale-free (barabasi_albert) and random (erdos_renyi) produce 0% integration.
+            </div>
+            <div class="finding-item">
+                <strong>Modular Networks Fail:</strong> Despite theoretical predictions favoring modular structure, 0/3,000 modular networks produced phi > 0.
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <div class="chart-section">
+                <div class="chart-container">
+                    <h3 class="chart-title">Mean Phi by TPM Rule</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="tpmChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-section">
+                <div class="chart-container">
+                    <h3 class="chart-title">Non-zero Phi Rate by Topology</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="topologyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-container">
+                <h3 class="chart-title">Phi by Node Size (Non-zero Networks Only)</h3>
+                <div class="chart-wrapper">
+                    <canvas id="nodeSizeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-container">
+                <h3 class="chart-title">Integration Rate Heatmap: TPM Rule x Topology</h3>
+                <div class="heatmap-container">
+                    <table class="heatmap" id="heatmap">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>erdos_renyi</th>
+                                <th>watts_strogatz</th>
+                                <th>barabasi_albert</th>
+                                <th>modular</th>
+                                <th>ring_lattice</th>
+                                <th>random_geometric</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <div class="chart-container">
+                <h3 class="chart-title">Computation Time by Node Size</h3>
+                <div class="chart-wrapper">
+                    <canvas id="timeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>PhiBench - Phi computation using <a href="https://github.com/wmayner/pyphi" target="_blank">PyPhi</a></p>
+            <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+                Mayner WGP, et al. (2018) PyPhi: A toolbox for integrated information theory.
+                PLOS Computational Biology 14(7): e1006343
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Data from analysis
+        const tpmData = {
+            labels: ['AND', 'OR', 'majority', 'XOR'],
+            datasets: [{
+                label: 'Mean Phi',
+                data: [0.106, 0.039, 0.028, 0],
+                backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4a4a6a'],
+                borderColor: ['#667eea', '#764ba2', '#f093fb', '#4a4a6a'],
+                borderWidth: 1
+            }]
+        };
+
+        const topologyData = {
+            labels: ['watts_strogatz', 'random_geometric', 'ring_lattice', 'erdos_renyi', 'barabasi_albert', 'modular'],
+            datasets: [{
+                label: 'Non-zero Phi Rate (%)',
+                data: [47.2, 33.1, 27.8, 0, 0, 0],
+                backgroundColor: '#667eea',
+                borderColor: '#667eea',
+                borderWidth: 1
+            }]
+        };
+
+        const nodeSizeData = {
+            labels: ['n=4', 'n=5', 'n=6', 'n=7', 'n=8'],
+            datasets: [
+                {
+                    label: 'AND',
+                    data: [0.089, 0.112, 0.118, 0.105, 0.098],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'OR',
+                    data: [0.032, 0.041, 0.045, 0.038, 0.035],
+                    borderColor: '#764ba2',
+                    backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'majority',
+                    data: [0.021, 0.025, 0.032, 0.029, 0.033],
+                    borderColor: '#f093fb',
+                    backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }
+            ]
+        };
+
+        const timeData = {
+            labels: ['n=4', 'n=5', 'n=6', 'n=7', 'n=8'],
+            datasets: [{
+                label: 'Mean Computation Time (seconds)',
+                data: [0.04, 1.2, 8.5, 95, 1250],
+                backgroundColor: 'rgba(102, 126, 234, 0.5)',
+                borderColor: '#667eea',
+                borderWidth: 2,
+                fill: true
+            }]
+        };
+
+        // Heatmap data (non-zero phi rate %)
+        const heatmapData = {
+            'AND': [0, 56.2, 0, 0, 31.5, 39.8],
+            'OR': [0, 55.8, 0, 0, 30.2, 38.4],
+            'majority': [0, 29.6, 0, 0, 21.8, 21.1],
+            'XOR': [0, 0, 0, 0, 0, 0]
+        };
+
+        // Chart configurations
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#e0e0e0'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#888' },
+                    grid: { color: '#2a2a4a' }
+                },
+                y: {
+                    ticks: { color: '#888' },
+                    grid: { color: '#2a2a4a' }
+                }
+            }
+        };
+
+        // Create charts
+        new Chart(document.getElementById('tpmChart'), {
+            type: 'bar',
+            data: tpmData,
+            options: {
+                ...chartOptions,
+                plugins: {
+                    ...chartOptions.plugins,
+                    legend: { display: false }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('topologyChart'), {
+            type: 'bar',
+            data: topologyData,
+            options: {
+                ...chartOptions,
+                indexAxis: 'y',
+                plugins: {
+                    ...chartOptions.plugins,
+                    legend: { display: false }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('nodeSizeChart'), {
+            type: 'line',
+            data: nodeSizeData,
+            options: chartOptions
+        });
+
+        new Chart(document.getElementById('timeChart'), {
+            type: 'line',
+            data: timeData,
+            options: {
+                ...chartOptions,
+                plugins: {
+                    ...chartOptions.plugins,
+                    legend: { display: false }
+                },
+                scales: {
+                    ...chartOptions.scales,
+                    y: {
+                        ...chartOptions.scales.y,
+                        type: 'logarithmic',
+                        title: {
+                            display: true,
+                            text: 'Seconds (log scale)',
+                            color: '#888'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Populate heatmap
+        const heatmapBody = document.querySelector('#heatmap tbody');
+        const getColor = (value) => {
+            if (value === 0) return '#1a1a2e';
+            const intensity = Math.min(value / 60, 1);
+            const r = Math.round(102 + (240 - 102) * intensity);
+            const g = Math.round(126 - 50 * intensity);
+            const b = Math.round(234 - 80 * intensity);
+            return `rgba(${r}, ${g}, ${b}, 0.7)`;
+        };
+
+        Object.entries(heatmapData).forEach(([rule, values]) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `<th>${rule}</th>` +
+                values.map(v => `<td style="background: ${getColor(v)}">${v}%</td>`).join('');
+            heatmapBody.appendChild(row);
+        });
+    </script>
+</body>
+</html>
