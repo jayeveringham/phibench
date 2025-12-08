@@ -1,198 +1,197 @@
-# PhiBench Implementation Plan
+# PhiBench: C++/CUDA Implementation Plan
 
-## Goal
-Build a high-performance C/CUDA implementation of Integrated Information Theory (IIT) Φ calculation, validated against PyPhi.
+## Project Evolution
 
----
-
-## Phase 1: Understanding PyPhi (Week 1)
-
-### Key Files to Study
-```
-pyphi/
-├── compute/big_phi.py    # Main Φ computation entry point
-├── compute/subsystem.py  # Subsystem analysis
-├── models/subsystem.py   # Core data structures
-├── partition.py          # Bipartition enumeration
-├── direction.py          # Cause vs effect
-├── distance.py           # EMD implementation
-├── tpm.py               # Transition probability matrices
-└── repertoire.py        # Cause/effect repertoires
-```
-
-### Tasks
-- [ ] Read and document PyPhi's Φ algorithm flow
-- [ ] Identify data structures (TPM, repertoires, partitions)
-- [ ] Map computational bottlenecks
-- [ ] Run PyPhi on test cases to understand I/O
+PhiBench started as a PyPhi benchmarking project (20,100 networks, 298 compute hours). Now evolving into the **first high-performance C++/CUDA implementation of IIT Φ**.
 
 ---
 
-## Phase 2: C Foundation (Week 2-3)
+## Why This Matters
 
-### Directory Structure
-```
-src/
-├── tpm.h / tpm.c         # Transition probability matrix
-├── partition.h / partition.c  # Partition enumeration
-├── emd.h / emd.c         # Earth mover's distance
-├── repertoire.h / repertoire.c  # Probability distributions
-├── phi.h / phi.c         # Main Φ computation
-└── main.c                # CLI interface
-
-tests/
-├── test_tpm.c
-├── test_partition.c
-├── test_emd.c
-└── test_phi.c
-
-python/
-└── phicuda.py            # Python bindings for validation
-```
-
-### Tasks
-- [ ] Implement TPM data structure in C
-- [ ] Implement partition enumeration
-- [ ] Implement EMD (Earth Mover's Distance)
-- [ ] Implement cause/effect repertoire calculation
-- [ ] Implement basic Φ computation (single-threaded)
-- [ ] Validate against PyPhi outputs
+- **No C++/CUDA implementation exists** - confirmed via extensive search
+- PyPhi (Python) is the only real implementation, limited to n≈12-15 nodes
+- IIT researchers are bottlenecked by compute
+- A 100x speedup would enable research that's currently impossible
 
 ---
 
-## Phase 3: CUDA Parallelization (Week 4-6)
+## Reference Materials (git ignored)
 
-### Parallelization Strategy
-1. **Partition-level parallelism**: Each CUDA thread evaluates one partition
-2. **Batch-level parallelism**: Multiple networks computed simultaneously
-3. **Matrix operations**: cuBLAS for probability calculations
-
-### Files
-```
-cuda/
-├── tpm.cu               # TPM operations on GPU
-├── partition.cu         # Parallel partition evaluation
-├── emd.cu              # GPU-accelerated EMD
-├── phi.cu              # Main CUDA kernel
-└── phi_cuda.h          # CUDA API
-```
-
-### Tasks
-- [ ] Port TPM to CUDA
-- [ ] Implement parallel partition evaluation kernel
-- [ ] Optimize memory access patterns (coalescing)
-- [ ] Implement reduction for finding MIP
-- [ ] Benchmark vs CPU implementation
+| Directory | Source | Purpose |
+|-----------|--------|---------|
+| `pyphi/` | github.com/wmayner/pyphi | Reference implementation, validation |
+| `iit-pseudocode/` | github.com/CSC-UW/iit-pseudocode | Algorithm structure |
 
 ---
 
-## Phase 4: Validation & Benchmarking (Week 7-8)
+## Algorithm Overview (from pseudocode)
 
-### Validation Suite
+### Core Functions
+
+```
+BigPhi(Candidate Set C):
+    for each unidirectional partition Z of C:
+        distance = XEMD(ConceptualStructure(C), ConceptualStructure(C'))
+    return min(distances)
+
+ConceptualStructure(C):
+    for each mechanism M in powerset(C):
+        compute Concept(M)
+
+Concept(M, C):
+    core_cause = argmax over purviews P: SmallPhiCause(M, P)
+    core_effect = argmax over purviews P: SmallPhiEffect(M, P)
+    return [CauseRepertoire(M, core_cause), EffectRepertoire(M, core_effect)]
+
+SmallPhiCause(Mechanism M, Purview P):
+    for every partition Z of M/P:
+        partitioned = CauseRepertoire(M1,P1) × CauseRepertoire(M2,P2)
+        distance = EMD(partitioned, unpartitioned)
+    return min(distances)
+```
+
+### Key Data Structures
+
+1. **TPM (Transition Probability Matrix)**: 2^n × 2^n matrix
+2. **Repertoire**: Probability distribution over states
+3. **Partition**: Way to split mechanism/purview into parts
+4. **Concept**: (cause_repertoire, effect_repertoire, phi)
+
+---
+
+## Parallelization Strategy
+
+| Level | What | CUDA Approach |
+|-------|------|---------------|
+| System partitions | Independent BigPhi evals | 1 thread per partition |
+| Mechanisms | Independent concepts | 1 thread per mechanism |
+| M/P partitions | Independent SmallPhi evals | 1 thread per partition |
+| EMD | Matrix operations | cuBLAS or custom kernel |
+| Batch networks | Multiple networks at once | Stream parallelism |
+
+**RTX 3090**: 10,496 CUDA cores, 24GB VRAM - can attack all levels simultaneously.
+
+---
+
+## Implementation Phases
+
+### Phase 1: C++ Foundation (CPU)
+- [ ] TPM data structure and operations
+- [ ] Partition enumeration (bipartitions)
+- [ ] Cause/effect repertoire calculation
+- [ ] EMD (Earth Mover's Distance)
+- [ ] SmallPhi computation
+- [ ] BigPhi computation
+- [ ] Validate against PyPhi on small networks (n=4-6)
+
+### Phase 2: CUDA Kernels
+- [ ] Port TPM to device memory
+- [ ] Parallel partition evaluation kernel
+- [ ] Parallel mechanism evaluation kernel  
+- [ ] GPU-accelerated EMD
+- [ ] Memory-efficient design for larger n
+- [ ] Validate against CPU implementation
+
+### Phase 3: Optimization
+- [ ] Memory coalescing
+- [ ] Shared memory usage
+- [ ] Stream concurrency for batch processing
+- [ ] Profile and eliminate bottlenecks
+
+### Phase 4: Validation & Benchmarking
+- [ ] Test against all 20,100 existing PyPhi results
+- [ ] Measure speedup vs PyPhi
+- [ ] Push to larger n (target: n=18-22)
+- [ ] Document failure modes and precision limits
+
+### Phase 5: Release
+- [ ] Clean API
+- [ ] Python bindings (pybind11)
+- [ ] Documentation
+- [ ] Paper draft
+
+---
+
+## Directory Structure
+
+```
+phibench/
+├── README.md              # Benchmark results (existing)
+├── PLAN.md               # This file
+├── src/                  # Existing Python benchmarking code
+├── results/              # 20,100 PyPhi results (validation data!)
+├── cuda/                 # NEW: C++/CUDA implementation
+│   ├── include/
+│   │   ├── tpm.hpp
+│   │   ├── partition.hpp
+│   │   ├── repertoire.hpp
+│   │   ├── emd.hpp
+│   │   └── phi.hpp
+│   ├── src/
+│   │   ├── tpm.cpp
+│   │   ├── partition.cpp
+│   │   ├── repertoire.cpp
+│   │   ├── emd.cpp
+│   │   ├── phi.cpp
+│   │   └── main.cpp
+│   ├── kernels/
+│   │   ├── partition.cu
+│   │   ├── repertoire.cu
+│   │   └── phi.cu
+│   ├── tests/
+│   │   └── test_against_pyphi.cpp
+│   └── CMakeLists.txt
+├── pyphi/                # Reference (git ignored)
+└── iit-pseudocode/       # Algorithm reference (git ignored)
+```
+
+---
+
+## Validation Strategy
+
 ```python
-# Generate test cases with PyPhi
-for n in range(4, 16):
-    for _ in range(1000):
-        network = random_network(n)
-        phi_pyphi = pyphi.compute.phi(network)
-        save_test_case(network, phi_pyphi)
-
-# Validate CUDA implementation
-for test in load_test_cases():
-    phi_cuda = phicuda.compute_phi(test.network)
-    assert abs(phi_cuda - test.phi_pyphi) < 1e-10
+# We already have ground truth from existing benchmarks
+for network in existing_results:
+    phi_pyphi = network['phi']  # Already computed
+    phi_cuda = phicuda.compute(network['tpm'])
+    assert abs(phi_pyphi - phi_cuda) < 1e-10
 ```
 
-### Benchmarks
-- [ ] Time vs n (system size)
-- [ ] Time vs network density
-- [ ] Speedup vs PyPhi
-- [ ] Memory usage
-- [ ] Scaling across GPU architectures
-
----
-
-## Phase 5: Paper & Release (Week 9-12)
-
-### Paper Outline
-1. Introduction: IIT computational bottleneck
-2. Background: IIT formalism, PyPhi
-3. Methods: C/CUDA implementation details
-4. Results: Benchmarks, speedup factors
-5. Discussion: Enabling new research directions
-6. Availability: Open source release
-
-### Release Checklist
-- [ ] Clean API documentation
-- [ ] Installation instructions (Linux, CUDA requirements)
-- [ ] Python bindings (pip installable)
-- [ ] Example scripts
-- [ ] License (MIT or Apache 2.0)
-
----
-
-## Key Algorithms to Implement
-
-### 1. Transition Probability Matrix (TPM)
-- 2^n × 2^n matrix for n-node system
-- Entry [i,j] = P(state j | state i)
-
-### 2. Bipartition Enumeration
-- Generate all ways to split nodes into two non-empty sets
-- For n nodes: Bell(n) - 1 partitions (excluding trivial)
-
-### 3. Earth Mover's Distance (EMD)
-- Optimal transport between probability distributions
-- Used to measure information distance
-
-### 4. Cause/Effect Repertoires
-- Probability distribution over past/future states
-- Given current state, what caused it? What will it cause?
-
-### 5. Integrated Information (Φ)
-- φ = min over partitions of: EMD(whole_repertoire, partitioned_repertoire)
-- The "minimum information partition" (MIP) cuts the system at its weakest link
-
----
-
-## Hardware Target
-
-### Primary: RTX 3090
-- 10,496 CUDA cores
-- 24 GB GDDR6X
-- 936 GB/s memory bandwidth
-
-### Requirements
-- CUDA Toolkit 11.0+
-- GCC 9+ or Clang 10+
-- Python 3.8+ (for validation)
+The 20,100 networks with known Φ values = comprehensive test suite.
 
 ---
 
 ## Success Criteria
 
-1. **Correctness**: Match PyPhi to 1e-10 precision on all test cases
+1. **Correctness**: Match PyPhi to 1e-10 on all 20,100 test cases
 2. **Speed**: 100x+ faster than PyPhi for n ≥ 10
-3. **Scalability**: Push tractable n from ~15 to ~20
-4. **Usability**: Simple API, pip-installable Python bindings
+3. **Scale**: Push tractable n from ~15 to ~20
+4. **Usability**: Simple C++ API + Python bindings
 
 ---
 
-## Risk Factors
+## Hardware
 
-| Risk | Mitigation |
-|------|------------|
-| EMD is complex to parallelize | Start with simpler distance metrics |
-| Memory limits for large n | Streaming computation, memory-efficient partitioning |
-| Numerical precision issues | Use double precision, careful reduction |
-| PyPhi bugs (false ground truth) | Cross-reference with IIT papers |
+**Primary development**: RTX 3090
+- 10,496 CUDA cores
+- 24 GB GDDR6X
+- 936 GB/s bandwidth
+
+**Requirements**:
+- CUDA Toolkit 11.0+
+- CMake 3.18+
+- C++17 compiler
 
 ---
 
 ## Next Steps
 
-1. SSH into dev machine
-2. Install PyPhi: `pip install pyphi`
-3. Run first test: compute Φ for 4-node network
-4. Begin reading PyPhi source code
+1. Read PyPhi source to understand implementation details
+2. Implement TPM and partition enumeration in C++
+3. Implement SmallPhi (CPU) and validate
+4. Port to CUDA
+5. Iterate
 
+---
+
+*Last updated: December 2024*
