@@ -1,6 +1,24 @@
 # PhiBench
 
-Systematic benchmark of Integrated Information Theory (IIT) Phi values across network topologies and TPM rules.
+Systematic benchmark of Integrated Information Theory (IIT) Phi values across network topologies and TPM rules, plus a **high-performance C++ implementation** validated against PyPhi.
+
+## C++/CUDA Implementation (NEW)
+
+A C++ implementation of IIT Phi computation, designed for GPU acceleration:
+
+```bash
+cd cuda
+g++ -std=c++20 -O2 -I include -o test_validation tests/test_validation.cpp
+./test_validation  # 24/24 tests pass
+```
+
+**Status:** Phase 1 (CPU) complete - 3240/3240 PyPhi validation tests pass (~2e-6 precision)
+
+See [PLAN.md](PLAN.md) for implementation details and roadmap.
+
+---
+
+## PyPhi Benchmark Results
 
 This project uses [PyPhi](https://github.com/wmayner/pyphi) to compute exact integrated information. If you use this benchmark or PyPhi in your research, please cite:
 
@@ -87,6 +105,8 @@ Total: 20,100 networks (some configurations produce fewer due to topology constr
 
 ```
 phibench/
+  README.md              # This file
+  PLAN.md                # C++ implementation roadmap
   config.json            # Benchmark configuration
   run_benchmark.py       # Main benchmark runner
   analyze_results.py     # Analysis and visualization data export
@@ -98,7 +118,13 @@ phibench/
     phi_results/
       all_results.csv    # Combined results (20,100 networks)
     visualization.html   # Interactive results dashboard
-    visualization_data.json  # Chart data for visualization
+  cuda/                  # C++/CUDA implementation
+    include/phi/         # Header-only library
+      core/types.hpp     # Core types (NodeSet, StateIndex, Real)
+      data/              # TPM, Repertoire, Network, Subsystem
+      partition/         # Bipartition enumeration
+      compute/           # SmallPhi, BigPhi, EMD algorithms
+    tests/               # Validation against PyPhi
 ```
 
 ## Configuration
@@ -138,12 +164,17 @@ cd results && python -m http.server 8888
 
 ## Dependencies
 
+### Python (PyPhi benchmark)
 - Python 3.10+
 - pyphi
 - numpy
 - networkx
 - pandas
 - scipy
+
+### C++ Implementation
+- C++20 compiler (g++ 10+ or clang++ 11+)
+- CUDA Toolkit 11.0+ (for Phase 2 GPU acceleration)
 
 ## References
 
