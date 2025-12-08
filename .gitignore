@@ -18,8 +18,9 @@ results/metadata/
 # OS
 .DS_Store
 
-# Claude hooks
+# Claude Code
 .claude/
+CLAUDE.md
 
 # Playwright MCP
 .playwright-mcp/
