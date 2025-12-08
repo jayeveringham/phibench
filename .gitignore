@@ -1,1 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Results (exclude raw network files, keep CSV summary)
+results/networks/
+results/metadata/
+*.parquet
+*.log
+*.npz
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Claude hooks
+.claude/
+
+# Playwright MCP
+.playwright-mcp/
+
+# PyPhi reference (cloned for development)
 pyphi/
